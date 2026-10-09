@@ -1,0 +1,35 @@
+星际图谱 2.0 影像来源与处理记录（2026-10-09）
+
+NASA 3D Resources 官方仓库
+https://github.com/nasa/NASA-3D-Resources
+参考版本 11ebb4ee043715aefbba6aeec8a61746fad67fa7
+采用 Images and Textures 下 Mars/Mars.jpg、Jupiter/Jupiter.jpg、Saturn/Saturn.jpg、Neptune/Neptune.jpg。
+Venus/Venus.jpg 作为雷达地表参考保存，不作为可见光金星云层贴图。
+官方仓库列明这些资源免费且无版权限制；NASA 标识不用于背书。
+火星等贴图为历史合成图，可能有色彩处理、重建或分辨率限制。
+
+地球：NASA Blue Marble 衍生全球影像
+来源：https://visibleearth.nasa.gov/collection/1484/blue-marble
+公开下载镜像：https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg
+此图无云层；不是当日卫星影像。
+
+月球：NASA Scientific Visualization Studio CGI Moon Kit
+NASA/GSFC/ASU，LRO / LROC，Ernie Wright (USRA)
+https://svs.gsfc.nasa.gov/4720/
+https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_1k.jpg
+2019 拼接版，含极区补充数据；不作科学测量。
+
+水星：NASA / Johns Hopkins University Applied Physics Laboratory / Carnegie Institution of Washington
+https://science.nasa.gov/photojournal/full-global-mercury-mosaic/
+PIA12397，NASA MESSENGER 全球拼接图；黑色区为缺测，不是天然地貌。
+
+冥王星：NASA / Johns Hopkins University Applied Physics Laboratory / Southwest Research Institute / Lunar and Planetary Institute
+https://science.nasa.gov/resource/pluto-global-color-map/
+New Horizons 全球拼接图；各区域分辨率不一致，有未观测区域。
+
+处理方法：压缩为不超过 1024×512 的 JPEG，嵌入 textures.js 以便 file:// 下离线渲染。
+球面渲染采样 720×360，光照和自转为教学近似。
+海王星旧图降低饱和度并提亮，不能视为标定真彩色复原。
+金星云层、天王星、太阳、天狼星 A/B、行星环与沉浸地形为程序重建。
+没有获取或生成虚假的天狼星可分辨表面照片。
+近地表山丘、岩石和水冰区域是教学透视场景，不是 NASA 实测高程或水资源定位数据。

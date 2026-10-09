@@ -1,0 +1,14 @@
+// Perspective height field for teaching environments; no claim of measured topography.
+const terrainSeed=(x,z)=>Math.sin(x*.017+Math.sin(z*.021))*9+Math.sin(z*.013+x*.008)*14+Math.sin(x*.071-z*.063)*2;
+function rgb(hex){return [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16))}
+function terrainScene(w,h,horizon,alt,a,polar){
+ const base=rgb(a.ground),fog=rgb(a.sky),far=1800,focal=w*.68,rows=48,cols=44,water=worldId==='earth'&&!polar,ice=polar&&['earth','mars','moon','mercury','pluto'].includes(worldId),sy=Math.sin(viewYaw),cy=Math.cos(viewYaw),move=travel*28;
+ const world=(x,z)=>[x*cy+z*sy+move*sy,z*cy-x*sy+move*cy];
+ const height=(x,z)=>{let y=terrainSeed(x,z);if(['moon','mercury'].includes(worldId)){const dx=((x%180)+180)%180-90,dz=((z%180)+180)%180-90,dist=Math.hypot(dx,dz);y+=dist<48?-17*(1-dist/48):dist<60?5*Math.sin((dist-48)/12*Math.PI):0;}return y};
+ const camHeight=height(move*sy,move*cy)+8+alt*alt*380;
+ wx.fillStyle=a.ground;wx.fillRect(0,horizon,w,h-horizon);
+ const project=(x,z)=>{const [xx,zz]=world(x,z),sea=water&&xx>90+Math.sin(zz*.005)*65,y=sea?-14:height(xx,zz);return {x:w/2+x/z*focal,y:horizon+(camHeight-y)/z*focal,wx:xx,wz:zz,level:y,sea,z}};
+ for(let row=rows-1;row>=0;row--){const z0=2*Math.pow(far/2,row/rows),z1=2*Math.pow(far/2,(row+1)/rows);for(let col=0;col<cols;col++){const s0=(col/cols-.5)*2,s1=((col+1)/cols-.5)*2;const p=[project(s0*z0,z0),project(s1*z0,z0),project(s1*z1,z1),project(s0*z1,z1)];if(p.every(v=>v.y>h+120)||p.every(v=>v.y<0))continue;const mid=p[0],isIce=ice&&(worldId==='earth'||worldId==='mars'||Math.sin(mid.wx*.025)*Math.cos(mid.wz*.021)>.58),color=mid.sea?[26,79,103]:isIce?[187,206,213]:base;const shade=Math.max(.42,Math.min(1.3,.82+(p[2].level-p[0].level)*.025)),blend=Math.min(.87,z0/far*.8);wx.fillStyle=`rgb(${color.map((v,k)=>Math.round(v*shade*(1-blend)+fog[k]*blend)).join(',')})`;wx.beginPath();wx.moveTo(p[0].x,p[0].y);for(let k=1;k<4;k++)wx.lineTo(p[k].x,p[k].y);wx.closePath();wx.fill();wx.strokeStyle=wx.fillStyle;wx.lineWidth=.5;wx.stroke();}}
+ // Local boulders stay attached to world coordinates as the camera moves.
+ for(let i=0;i<130;i++){const xx=(i*137.137%800)-400,zz=(i*71.91%800)-300,dx=xx-move*sy,dz=zz-move*cy,z=dx*sy+dz*cy,x=dx*cy-dz*sy;if(z<7)continue;if(water&&xx>90+Math.sin(zz*.005)*65)continue;const px=w/2+x/z*focal,py=horizon+(camHeight-height(xx,zz))/z*focal,size=(1.1+i%4*.55)/z*focal;if(px<-30||px>w+30||py>h+40)continue;const tone=polar&&i%9===0?'#abbcc2':a.ground;wx.fillStyle='#151b2180';wx.beginPath();wx.ellipse(px+size,py+size*.12,size*1.6,size*.25,0,0,Math.PI*2);wx.fill();wx.fillStyle=tone;wx.beginPath();wx.moveTo(px-size,py);wx.lineTo(px-size*.5,py-size*.8);wx.lineTo(px+size*.4,py-size);wx.lineTo(px+size,py);wx.fill();wx.fillStyle='#ffffff30';wx.beginPath();wx.moveTo(px-size*.5,py-size*.8);wx.lineTo(px+size*.4,py-size);wx.lineTo(px+size*.15,py-size*.1);wx.fill();}
+}
